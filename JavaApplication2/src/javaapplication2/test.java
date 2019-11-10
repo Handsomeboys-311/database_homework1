@@ -2,7 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package javaapplication2;
+import static javax.swing.JOptionPane.showInputDialog;
+import static javax.swing.JOptionPane.showMessageDialog;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -79,13 +82,14 @@ public class test {
          try{
              Statement statement=conn.createStatement();
              rs=statement.executeQuery(sql);
+             String context="";
             while(rs.next()){
-                System.out.println("title:"+rs.getString("title")+"  "+"price:"+rs.getString("price")+"  "+"person:"+rs.getString("person")+"\n");
+                context+="title:"+rs.getString("title")+"  "+"price:"+rs.getString("price")+"  "+"person:"+rs.getString("person")+"\n";
               jedis.set(m+y,"title:"+rs.getString("title")+"  "+"price:"+rs.getString("price")+"  "+"person:"+rs.getString("person")+"\n"
                       ); 
               jedis.expire(m+y, 60);
             }      
-            
+             showMessageDialog(null,context);
              rs.close();
              
          }catch(Exception e){
@@ -97,7 +101,7 @@ public class test {
 	            PreparedStatement ps = conn.prepareStatement(upsql);
 	            int result=ps.executeUpdate();//返回行数或者0
 	            if(result>0){
-	            	System.out.println("更新成功");
+	            	 showMessageDialog(null,"更新成功");
 	            	return true;
 	            }
 	        } catch (SQLException ex) {
@@ -110,7 +114,7 @@ public class test {
 	            PreparedStatement ps = conn.prepareStatement(delsql);
 	            int result=ps.executeUpdate();
 	            if(result>0){
-	            	System.out.println("删除成功.......");
+	            	 showMessageDialog(null,"删除成功.......");
 	            	return true;
 	            }
 	        } catch (SQLException ex) {
@@ -123,7 +127,7 @@ public class test {
 	            PreparedStatement ps = conn.prepareStatement(cresql);
 	            int result=ps.executeUpdate();
 	            if(result>0){
-	            	System.out.println("数据表创建成功.......");
+	            	 showMessageDialog(null,"数据表创建成功.......");
 	            	return true;
 	            }
 	        } catch (SQLException ex) {
@@ -136,7 +140,7 @@ public class test {
 	            PreparedStatement ps = conn.prepareStatement(dropsql);
 	            int result=ps.executeUpdate();
 	            if(result>0){
-	            	System.out.println("数据表删除成功.......");
+	             showMessageDialog(null,"数据表删除成功.......");
 	            	return true;
 	            }
 	        } catch (SQLException ex) {
@@ -145,14 +149,14 @@ public class test {
 	         }
 	 public static void Join(String joinsql){
 	        try {
-	        	System.out.println(joinsql);
+	        	//System.out.println(joinsql);
 	             Statement statement=conn.createStatement();
 	             rst=statement.executeQuery(joinsql);
 	             if(rst.next()==false)
-	            	 System.out.println("联结失败......");
+	            	  showMessageDialog(null,"联结失败......");
 	             while(rst.next()){
-	            	 System.out.println("联结成功......");
-	            	 System.out.println("title:"+rs.getString("title")+"  "+"price:"+rs.getString("price")+"\n");
+	            	  showMessageDialog(null,"联结成功......\n"+"title:"+rs.getString("title")+"  "+"price:"+rs.getString("price")+"\n");
+	            	  
 	                //System.out.println("title:"+rs.getString("title")+"  "+"price:"+rs.getString("price")+"  "+"person:"+rs.getString("person")+
 	                //		"title2:"+rs.getString("title2")+"  "+"price2:"+rs.getString("price2")+"\n");
 	              }
@@ -165,10 +169,12 @@ public class test {
 		 DatabaseMetaData meta = conn.getMetaData();  
 		   ResultSet rb = meta.getTables(null, null, null,  
 		   new String[] { "TABLE" });  
+                   String list="";
 		   while (rb.next()) {  
-			   System.out.println("*****数据库所包含的表为*****");
-		       System.out.println("表名：" + rb.getString(3));  
+			   list+="*****数据库所包含的表为*****\n";
+		       list+="表名：" + rb.getString(3);  
 		       }
+                    showMessageDialog(null,list);
 		   return;
 	 }
    public static void main(String[] args) throws Exception {
@@ -180,18 +186,22 @@ public class test {
            conn = DriverManager.getConnection("jdbc:odbc:homework","root","password");
            // 上面的两个root依次表示MySQL数据库的登陆用户名和密码，根据自己的设置而更改
            Statement stmt = conn.createStatement();
-    	   System.out.println("********************mysql操作系统********************");
+    	 
     	   boolean fg=true;
     	   while(fg){
-    		   System.out.println("已连接到311数据库，请选择您要进行的操作......");
-        	   System.out.println("1、查询现有数据表");
-        	   System.out.println("2、对现有数据表进行操作");
-        	   System.out.println("3、创建数据表");
-        	   System.out.println("4、删除数据表");
-        	   System.out.println("5、跨数据表");
-        	   System.out.println("6、退出");
-        	   Scanner s = new Scanner(System.in);
-        	   String b=s.nextLine();
+                String str ="********************mysql操作系统********************\n"
+                +  "1,查询现有数据表\n"
+
+                + "2,对现有数据表进行操作\n"
+
+                + "3,创建数据表\n"
+
+                + "4,删除数据表\n"
+
+                + "5,跨数据表\n"
+                +"6.退出\n";
+
+        String b = showInputDialog(str);
         	   int a =Integer.parseInt(b);
         	   switch(a){
         	   case 1:
@@ -200,58 +210,59 @@ public class test {
         	   case 2:
         		   boolean flag=true;
                    while(flag){
-                	   System.out.println("**********请选择您要进行的操作**********");
-                	   System.out.println("1、插入");
-                	   System.out.println("2、查询");
-                	   System.out.println("3、更新");
-                	   System.out.println("4、删除");
-                	   System.out.println("5、返回主菜单");
-                	   Scanner sc = new Scanner(System.in);
-                	   String i=sc.nextLine();
+                	   String str1="**********请选择您要进行的操作**********\n"
+                                   + "1、插入\n"
+                                   +"2、查询\n"
+                                   +"3、更新\n"
+                                   + "4、删除\n"
+                                   +"5、返回主菜单\n";
+                	   String i=showInputDialog(str1);
                 	   int ac=Integer.parseInt(i);
+                           String str1t;
                 	   switch(ac){
                 	   case 1:
-                		   System.out.println("*****请选择要插入的表格*****");
-                		   String p=sc.nextLine();
+                		    str1t="*****请选择要插入的表格*****";
+                		   String p=showInputDialog(str1t);
                 		   boolean ty=true;
                 		   while(ty){
                 			   user c=new user();               		   
-                    		   System.out.println("*****请输入插入数据的title*****");
-                    		   String bc=sc.nextLine();     
+                    		   str1t="*****请输入插入数据的title*****";
+                    		   String bc=showInputDialog(str1t);     
                     		   c.setTitle(bc);
-                    		   System.out.println("*****请输入插入数据的price*****");
-                    		   String x=sc.nextLine();
+                    		   str1t="*****请输入插入数据的price*****";
+                    		   String x=showInputDialog(str1t);
                     		   c.setPrice(Integer.parseInt(x));
-                    		   System.out.println("*****请输入插入数据的person*****");
-                    		   String d=sc.nextLine();
+                    		   str1t="*****请输入插入数据的person*****";
+                    		   String d=showInputDialog(str1t);
                     		   c.setPerson(Integer.parseInt(d)); 
                     		   insql="insert into "+p+"(title,price,person) values(?,?,?)";
                     		   InsertSql(insql,c);
-                    		   System.out.println("继续请输入1，回到上一级菜单请输入0");
-                    		   String z=sc.nextLine();
+                    		   str1t="1.继续输入\n"
+                                           + "0.回到上一级菜单";
+                    		   String z=showInputDialog(str1t);
                     		   if(Integer.parseInt(z)==0)
                     			   ty=false;
                 		   }
                 		   break;
                 	   case 2:
-                		   System.out.println("*****请选择要查询的表*****");
-                		   String m=sc.nextLine();
+                		   str1t="*****请选择要查询的表*****";
+                		   String m=showInputDialog(str1t);
                                  //  int t=m.charAt(m.length()-1);
                                    boolean q=true;    		  
                 		   while(q){
-                			   System.out.println("*****请输入要查询的id*****");
-                			   String y=sc.nextLine();
+                			   str1t="*****请输入要查询的id*****";
+                			   String y=showInputDialog(str1t);
                                            if(jedis.exists(m+y)){
                                              //  System.out.println("Redis");
-                                           System.out.println(jedis.get(m+y));
+                                           showMessageDialog(null,jedis.get(m+y));
                                            }
                                            else{
                                                jedis.del(m+y);
                 			   sql="select * from "+m+" where idtext="+y;
                 			   SelectSql(sql,m,y);
                                            }
-                			   System.out.println("继续请输入1，回到上一级菜单请输入0");
-                    		   String z=sc.nextLine();
+                			   str1t="1.继续输入\n"+"0.回到上一级菜单";
+                    		   String z=showInputDialog(str1t);
                     		   if(z.equals("0"))
                     			   q=false;
                 		   }      		   
@@ -259,24 +270,24 @@ public class test {
                 		  // SelectSql(sql);
                 		   break;
                 	   case 3:
-                		   System.out.println("*****请选择更新的表*****");
-                		   String n=sc.nextLine();
+                		   str1t="*****请选择更新的表******";
+                		   String n=showInputDialog(str1t);
                 		   boolean k=true;
                 		   while(k){
-                			   System.out.println("*****请选择要更新的id*****");
-                			   String y=sc.nextLine();
+                			   str1t="*****请选择要更新的id*****";
+                			   String y=showInputDialog(str1t);
                 			   boolean pt=true;
                     		   while(pt){
-                    			   System.out.println("*****请选择要更新的数据项*****");
-                            	   System.out.println("1、title");
-                            	   System.out.println("2、price");
-                            	   System.out.println("3、person");
-                            	   System.out.println("4、quit");
-                            	   String u=sc.nextLine();
+                    	           str1t="*****请选择要更新的数据项*****\n"+
+                            	   "1、title\n"+
+                            	   "2、price\n"+
+                            	   "3、person\n"+
+                            	   "4、quit\n";
+                            	   String u=showInputDialog(str1t);
                             	   switch(Integer.parseInt(u)){
                             	   		case 1:
-                            	   			System.out.println("*****请输入更新数据的title*****");
-                                 		    String w=sc.nextLine();
+                            	   			str1t="*****请输入更新数据的title*****";
+                                 		    String w=showInputDialog(str1t);
                                  		   upsql="update "+n+" set title='"+w+"' where idtext="+y;
                                  		  UpdateSql(upsql);    
                                                    if(jedis.exists(n+y)){
@@ -289,8 +300,8 @@ public class test {
                                                    rs.close();
                                  		   break;
                             	   		case 2:
-                            	   			System.out.println("*****请输入更新数据的price*****");
-                                 		    String e=sc.nextLine();           
+                            	   		str1t="*****请输入更新数据的price*****";
+                                 		    String e=showInputDialog(str1t) ;         
                                  		   upsql="update "+n+" set price='"+e+"' where idtext="+y;
                                  		  UpdateSql(upsql);
                                                                if(jedis.exists(n+y)){
@@ -303,8 +314,8 @@ public class test {
                                                                }
                                  		   break;
                             	   		case 3:
-                            	   			System.out.println("*****请输入更新数据的person*****");
-                                 		   String r=sc.nextLine();
+                            	   			str1t="*****请输入更新数据的person*****";
+                                 		   String r=showInputDialog(str1t);
                                  		  upsql="update "+n+" set person='"+r+"' where idtext="+y;
                                  		 UpdateSql(upsql);  
                                                    if(jedis.exists(n+y)){
@@ -320,8 +331,8 @@ public class test {
                             	   			break;
                             	   }
                     		   }
-                    		   System.out.println("继续请输入1，回到上一级菜单请输入0");
-                    		   String z=sc.nextLine();
+                    		   str1t="1.继续输入\n"+"0.回到上一级菜单";
+                    		   String z=showInputDialog(str1t);
                     		   if(Integer.parseInt(z)==0)
                     			   k=false;
                     		   else
@@ -331,12 +342,12 @@ public class test {
                 		   
                 		   break;
                 	   case 4:
-                		   System.out.println("*****请选择要删除元素所在的表*****");
-                		   String j=sc.nextLine();
+                		   str1t="*****请选择要删除元素所在的表*****";
+                		   String j=showInputDialog(str1t);
                 		   boolean h=true;    		  
                 		   while(h){
-                			   System.out.println("*****请选择要删除的id*****");
-                			   String y=sc.nextLine();
+                			   str1t="*****请选择要删除的id*****";
+                			   String y=showInputDialog(str1t);
                                                       if(jedis.exists(j+y)){
                                              jedis.del((j.charAt(j.length()-1) -1)*10000+y);
                                            }
@@ -344,8 +355,8 @@ public class test {
                 			   delsql="delete from "+j+" where idtext="+y;
                 			   DeletSql(delsql);
                                                       
-                			   System.out.println("继续请输入1，回到上一级菜单请输入0");
-                    		   String z=sc.nextLine();
+                			   str1t="1.继续输入\n"+"0.回到上一级菜单";
+                    		   String z=showInputDialog(str1t);
                     		   if(z.equals("0"))
                     			   h=false;
                 		   }      		   
@@ -358,22 +369,22 @@ public class test {
                    } 
                    break;
         	   case 3:
-        		   System.out.println("请输入创建数据表的指令（仅限一行）");
-        		   cresql=s.nextLine();
+        		   String str1t="请输入创建数据表的指令（仅限一行）";
+        		   cresql=showInputDialog(str1t);
         		   Create(cresql);
         		   break;
         	   case 4:
-        		   System.out.println("请输入删除数据表的名称");
-        		   dropsql="drop table "+s.nextLine();
+        		    str1t="请输入删除数据表的名称";
+        		   dropsql=showInputDialog(str1t);
         		   Drop(dropsql);
         		   break;
         	   case 5:
-        		   System.out.println("请输入表1的名称：");
-        		   String s1=s.nextLine();
-        		   System.out.println("请输入表2的名称：");
-        		   String s2=s.nextLine();
-        		   System.out.println("请输入关联的关键字：");
-        		   String s3=s.nextLine();
+        		   str1t="请输入表1的名称：";
+        		   String s1=showInputDialog(str1t);
+        		   str1t="请输入表2的名称：";
+        		   String s2=showInputDialog(str1t);
+        		   str1t="请输入关联的关键字：";
+        		   String s3=showInputDialog(str1t);
         		   joinsql="select t1.title,t1.price from "+s1+" t1"+" left outer join "+s2+" t2"+" on "+"t1."+s3+" = "+"t2."+s3;
         		   Join(joinsql);
         		   break;
@@ -384,7 +395,7 @@ public class test {
     	   }
     	  
        }catch (SQLException e) {
-           System.out.println("MySQL操作有误");
+            showMessageDialog(null,"MySQL操作有误");
            e.printStackTrace();
        } catch (Exception e) {
            e.printStackTrace();
