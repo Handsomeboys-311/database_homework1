@@ -15,7 +15,7 @@ public class TestingforMongoDB {
     private static MongoClient mongoClient;
     private static MongoDatabase mongoDatabase;
     private static int main, sub;
-    private static String collName, docuName;
+    private static String collName, key, value, nkey, nvalue;
     //---------------创建集合-------------------------
     private static void creatColl(String str){
         try{
@@ -32,6 +32,14 @@ public class TestingforMongoDB {
         }catch(Exception e){
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
             return null;
+        }
+    }
+    //---------------删除集合-------------------------
+    private static void deleteColl(MongoCollection mongoCollection){
+        try{
+            mongoCollection.drop();
+        }catch(Exception e){
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
         }
     }
     //---------------显示集合-------------------------
@@ -74,7 +82,8 @@ public class TestingforMongoDB {
             String newKey, String newValue){
         try{
             collection.updateOne(Filters.eq(oldKey,oldValue), 
-                    new Document("$rename",new Document(newKey,newValue)));
+                    new Document("$set",new Document(newKey,newValue)));
+            
         }catch(Exception e){
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
         }
@@ -91,8 +100,7 @@ public class TestingforMongoDB {
         String str = "1,创建集合\n"
                 + "2,选择并修改集合\n"
                 + "3,显示当前数据库内容\n"
-                + "4,删除集合\n"
-                + "5,退出\n";
+                + "4,退出\n";
         String choice = showInputDialog(str);
         return Integer.parseInt(choice);
     }
@@ -101,7 +109,8 @@ public class TestingforMongoDB {
                 + "2,查找文档\n"
                 + "3,更新文档\n"
                 + "4,删除文档\n"
-                + "5,返回\n";
+                + "5,删除集合\n"
+                + "6,返回\n";
         String choice = showInputDialog(str);
         return Integer.parseInt(choice);
     }
@@ -120,19 +129,37 @@ public class TestingforMongoDB {
                     case 2:   //选择并修改集合
                         collName = showInputDialog("输入集合名");
                         MongoCollection mongoCollection = selectColl(collName);
+                        Submenub = true;
                         while (Submenub) {
                             sub = subMenu();
                             switch (sub) {
                                 case 1:   //插入文档
+                                    Document docu;
+                                    key = showInputDialog("输入键");
+                                    value = showInputDialog("输入值");
+                                    docu = new Document(key, value);
+                                    insertDocu(mongoCollection, docu);
                                     break;
                                 case 2:   //显示文档
                                     showMessageDialog(null, findDocu(mongoCollection));
                                     break;
                                 case 3:   //更新文档
+                                    key = showInputDialog("输入旧键");
+                                    value = showInputDialog("输入旧值");
+                                    nkey = showInputDialog("输入新键(新键与旧键不同时会创建新键值对)");
+                                    nvalue = showInputDialog("输入新值");
+                                    updateDocu(mongoCollection, key, value, nkey, nvalue);
                                     break;
                                 case 4:   //删除文档
+                                    key = showInputDialog("输入键");
+                                    value = showInputDialog("输入值");
+                                    deleteDocu(mongoCollection, key, value);
                                     break;
-                                case 5:   //返回
+                                case 5:   //删除集合
+                                    deleteColl(mongoCollection);
+                                    Submenub = false;
+                                    break;
+                                case 6:   //返回
                                     Submenub = false;
                                     break;
                                 default:
