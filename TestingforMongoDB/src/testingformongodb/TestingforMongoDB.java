@@ -1,11 +1,10 @@
 package testingformongodb;
+import collection.collopera;
+import document.docuopera;
 
 import com.mongodb.MongoClient;
-import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
 import static javax.swing.JOptionPane.showInputDialog;
 import static javax.swing.JOptionPane.showMessageDialog;
 import org.bson.Document;
@@ -16,86 +15,7 @@ public class TestingforMongoDB {
     private static MongoDatabase mongoDatabase;
     private static int main, sub;
     private static String collName, key, value, nkey, nvalue;
-    //---------------创建集合-------------------------
-    private static void creatColl(String str){
-        try{
-            mongoDatabase.createCollection(str);
-        }catch(Exception e){
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-        }
-    }
-    //---------------选择集合-------------------------
-    private static MongoCollection selectColl(String str){
-        try{
-            MongoCollection<Document> collection = mongoDatabase.getCollection(str);
-            return collection;
-        }catch(Exception e){
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-            return null;
-        }
-    }
-    //---------------删除集合-------------------------
-    private static void deleteColl(MongoCollection mongoCollection){
-        try{
-            mongoCollection.drop();
-        }catch(Exception e){
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-        }
-    }
-    //---------------显示集合-------------------------
-    private static String displayColl(){
-        try{
-            String str = "";
-            for(String name : mongoDatabase.listCollectionNames()){
-                str += name + '\n';
-            }
-            return str;
-        }catch(Exception e){
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-            return null;
-        }
-    }
-    //---------------插入文档-------------------------
-    private static void insertDocu(MongoCollection collection, Document document){
-        try{
-            collection.insertOne(document);
-        }catch(Exception e){
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-        }
-    }
-    //---------------显示文档-------------------------
-    private static String findDocu(MongoCollection collection){
-        try{
-            String str = "";
-            FindIterable<Document> findIterable = collection.find();
-            MongoCursor<Document> mongoCursor = findIterable.iterator();
-            while(mongoCursor.hasNext())
-                str += mongoCursor.next().toString() + '\n';
-            return str;
-        }catch(Exception e){
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-            return null;
-        }
-    }
-    //---------------更新文档-------------------------
-    private static void updateDocu(MongoCollection collection, String oldKey, String oldValue,
-            String newKey, String newValue){
-        try{
-            collection.updateOne(Filters.eq(oldKey,oldValue), 
-                    new Document("$set",new Document(newKey,newValue)));
-            
-        }catch(Exception e){
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-        }
-    }
-    //---------------删除文档-------------------------
-    private static void deleteDocu(MongoCollection collection,String Key, String Value){
-        try{
-            collection.deleteOne(Filters.eq(Key, Value));
-        }catch(Exception e){
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-        }
-    }
+    
     private static int mainMenu(){
         String str = "1,创建集合\n"
                 + "2,选择并修改集合\n"
@@ -124,11 +44,11 @@ public class TestingforMongoDB {
                 switch (main) {
                     case 1:   //创建集合
                         collName = showInputDialog("输入集合名");
-                        creatColl(collName);
+                        collopera.creatColl(mongoDatabase, collName);
                         break;
                     case 2:   //选择并修改集合
                         collName = showInputDialog("输入集合名");
-                        MongoCollection mongoCollection = selectColl(collName);
+                        MongoCollection mongoCollection = collopera.selectColl(mongoDatabase, collName);
                         Submenub = true;
                         while (Submenub) {
                             sub = subMenu();
@@ -138,25 +58,25 @@ public class TestingforMongoDB {
                                     key = showInputDialog("输入键");
                                     value = showInputDialog("输入值");
                                     docu = new Document(key, value);
-                                    insertDocu(mongoCollection, docu);
+                                    docuopera.insertDocu(mongoCollection, docu);
                                     break;
                                 case 2:   //显示文档
-                                    showMessageDialog(null, findDocu(mongoCollection));
+                                    showMessageDialog(null, docuopera.findDocu(mongoCollection));
                                     break;
                                 case 3:   //更新文档
                                     key = showInputDialog("输入旧键");
                                     value = showInputDialog("输入旧值");
                                     nkey = showInputDialog("输入新键(新键与旧键不同时会创建新键值对)");
                                     nvalue = showInputDialog("输入新值");
-                                    updateDocu(mongoCollection, key, value, nkey, nvalue);
+                                    docuopera.updateDocu(mongoCollection, key, value, nkey, nvalue);
                                     break;
                                 case 4:   //删除文档
                                     key = showInputDialog("输入键");
                                     value = showInputDialog("输入值");
-                                    deleteDocu(mongoCollection, key, value);
+                                    docuopera.deleteDocu(mongoCollection, key, value);
                                     break;
                                 case 5:   //删除集合
-                                    deleteColl(mongoCollection);
+                                    collopera.deleteColl(mongoCollection);
                                     Submenub = false;
                                     break;
                                 case 6:   //返回
@@ -169,10 +89,11 @@ public class TestingforMongoDB {
                         }
                         break;
                     case 3:   //显示当前数据库内容
-                        showMessageDialog(null, displayColl());
+                        showMessageDialog(null, collopera.displayColl(mongoDatabase));
                         break;
                     case 4:   //退出
                         Mainmenub = false;
+                        mongoClient.close();
                         break;
                     default:
                         showMessageDialog(null, "输入正确数字");
